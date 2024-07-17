@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Folders in Dropbox</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+<style>
+    .folder-input {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .folder-input label {
+        margin-right: 10px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Create Folders in Dropbox</h2>
+
+<div class="folder-input">
+    <label for="mainFolder">Main Folder:</label>
+    <select id="mainFolder">
+        <option value="Building Records">Building Records</option>
+    </select>
+</div>
+
+<div class="folder-input">
+    <label for="subfolder1">Select State:</label>
+    <select id="subfolder1">
+        <option value="NSW">NSW</option>
+        <option value="VIC">VIC</option>
+        <option value="QLD">QLD</option>
+        <option value="ACT">ACT</option>
+    </select>
+</div>
+
+<div class="folder-input">
+    <label for="subfolder2">Site name:</label>
+    <input type="text" id="subfolder2" placeholder="Site name">
+</div>
+
+<div>
+    <button onclick="createFolders()">Create Folders</button>
+</div>
+
+<script>
+const CLIENT_ID = 'YOUR_DROPBOX_APP_CLIENT_ID'; // Replace with your Dropbox app client ID
+
+// Function to handle folder creation in Dropbox
+async function createFolders() {
+    const mainFolder = document.getElementById('mainFolder').value.trim();
+    const subfolder1 = document.getElementById('subfolder1').value.trim();
+    const subfolder2 = document.getElementById('subfolder2').value.trim();
+    
+    // Construct full folder path
+    let folderPath = '';
+
+    // Main Folder
+    folderPath += '/' + mainFolder.replace(/^\//, ''); // Ensure no leading '/'
+
+    // Subfolder 1
+    if (subfolder1) {
+        folderPath += '/' + subfolder1.replace(/^\//, ''); // Ensure no leading '/'
+    }
+
+    // Subfolder 2
+    if (subfolder2) {
+        folderPath += '/' + subfolder2.replace(/^\//, ''); // Ensure no leading '/'
+    }
+
+    try {
+        // Create folder in Dropbox
+        const response = await axios.post('https://api.dropboxapi.com/2/files/create_folder_v2', {
+            path: folderPath,
+            autorename: false // Set to true if you want Dropbox to auto-rename if a folder with the same name exists
+        }, {
+            headers: {
+                'Authorization': 'Bearer ' + getAccessToken(),
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log(response.data);
+        alert('Folders created successfully in Dropbox!');
+        
+    } catch (error) {
+        console.error('Error creating folders:', error.response ? error.response.data : error.message);
+        alert('Failed to create folders in Dropbox. Check console for details.');
+    }
+}
+
+// Function to get Dropbox access token (you may handle this differently in production)
+function getAccessToken() {
+    // Replace with your own method of retrieving/accessing the access token (e.g., from a secure server or local storage)
+    return 'sl.B5P-eFoqYd71OQpfSDCfWFqPaaRZIM3THfNO9vlVqM6nqPlIJE4omiyKX43icShW9_0sswGAzkIZe8plIvg3Il8gPXH3zIb0i1M-sHUn4xgIRTHE6Lwtp9yCwxJ7SIfRJIoROvi-9TBNop_5MtoHYtM';
+}
+</script>
+
+</body>
+</html>
