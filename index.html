@@ -38,8 +38,8 @@
 </div>
 
 <div class="folder-input">
-    <label for="subfolder2">Site name:</label>
-    <input type="text" id="subfolder2" placeholder="Site name">
+    <label for="siteName">Site Name:</label>
+    <input type="text" id="siteName" placeholder="Enter Site Name">
 </div>
 
 <div>
@@ -47,13 +47,18 @@
 </div>
 
 <script>
-const CLIENT_ID = 'YOUR_DROPBOX_APP_CLIENT_ID'; // Replace with your Dropbox app client ID
-
 // Function to handle folder creation in Dropbox
 async function createFolders() {
     const mainFolder = document.getElementById('mainFolder').value.trim();
     const subfolder1 = document.getElementById('subfolder1').value.trim();
-    const subfolder2 = document.getElementById('subfolder2').value.trim();
+    const siteName = document.getElementById('siteName').value.trim();
+    
+    // Validate if siteName and subfolder2 are provided
+    if (!siteName) {
+        alert('Please enter a Site Name.');
+        return;
+    }
+
     
     // Construct full folder path
     let folderPath = '';
@@ -66,10 +71,8 @@ async function createFolders() {
         folderPath += '/' + subfolder1.replace(/^\//, ''); // Ensure no leading '/'
     }
 
-    // Subfolder 2
-    if (subfolder2) {
-        folderPath += '/' + subfolder2.replace(/^\//, ''); // Ensure no leading '/'
-    }
+    // Site Name (subfolder 2)
+    folderPath += '/' + siteName.replace(/^\//, ''); // Ensure no leading '/'
 
     try {
         // Create folder in Dropbox
@@ -95,7 +98,7 @@ async function createFolders() {
 // Function to get Dropbox access token (you may handle this differently in production)
 function getAccessToken() {
     // Replace with your own method of retrieving/accessing the access token (e.g., from a secure server or local storage)
-    return 'sl.B5P-eFoqYd71OQpfSDCfWFqPaaRZIM3THfNO9vlVqM6nqPlIJE4omiyKX43icShW9_0sswGAzkIZe8plIvg3Il8gPXH3zIb0i1M-sHUn4xgIRTHE6Lwtp9yCwxJ7SIfRJIoROvi-9TBNop_5MtoHYtM';
+    return 'sl.B5P6qt20Oyi5_j1Y0_2i9mY_5omvcyowdRV_8g8GO2x-N6LkQWwvw_hKmikqa2w6USw7GrSZJJ2XFyV4cOmGAeJNl604MnhFpR-sTzW4UmKa-bX-Mqr7MlaByjCzlPvcQxd9cls8PZ5bcIhuZKGidV4';
 }
 </script>
 
