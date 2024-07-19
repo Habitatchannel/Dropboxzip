@@ -52,7 +52,9 @@ async function createFolders() {
     const mainFolder = document.getElementById('mainFolder').value.trim();
     const subfolder1 = document.getElementById('subfolder1').value.trim();
     const siteName = document.getElementById('siteName').value.trim();
-    
+    // Replace this placeholder with the actual Dropbox access token during build/deployment
+    const DROPBOX_ACCESS_TOKEN = 'sl.B5WBTW6a5xEkGYOFF3hNJLpGCOdQJvEBlBLooWNtCLnRubwPObWBCBoFWl-AVLfyrfEgsTve0c61j0BpNqV1QCfYWcCUq76alnh2itl8_jC07Y_9R71ozg5TC_f9SEdCglOUjnRXLK3WIh09CnL45NU';
+
     // Validate if siteName and subfolder2 are provided
     if (!siteName) {
         alert('Please enter a Site Name.');
@@ -100,6 +102,14 @@ function getAccessToken() {
     // Replace with your own method of retrieving/accessing the access token (e.g., from a secure server or local storage)
     return 'sl.B5S57qVNeGMC7F2_n4ffKHeW3hHtvZL62b0eABZyEOO5v87f-_dL_m-tWOvbey3dTJ2B9py5_ITA_NujkJdORCGNE5KkgAnqaIvPEffkA3Yl6JXVT8eyesAoaw8AFczuRjpeA75WsMpqS--J5iX7kt0';
 }
+    // Replace this placeholder with the actual Dropbox access token during build/deployment
+const DROPBOX_ACCESS_TOKEN = '__REPLACE_WITH_DROPBOX_ACCESS_TOKEN__';
+
+// Function to get Dropbox access token
+function getAccessToken() {
+    return DROPBOX_ACCESS_TOKEN;
+}
+
 </script>
 
 </body>
