@@ -4,13 +4,12 @@ async function createFolders() {
     const subfolder1 = document.getElementById('subfolder1').value.trim();
     const siteName = document.getElementById('siteName').value.trim();
     
-    // Validate if siteName and subfolder2 are provided
+    // Validate if siteName is provided
     if (!siteName) {
         alert('Please enter a Site Name.');
         return;
     }
 
-    
     // Construct full folder path
     let folderPath = '';
 
@@ -47,7 +46,7 @@ async function createFolders() {
 }
 
 function getAccessToken() {
-    // Implement your logic to fetch the access token securely
-    // For production, fetch securely from a server-side endpoint
+    // In a real application, fetch access token securely from a server-side endpoint
+    // For this example, use a placeholder for GitHub Secret
     return process.env.DROPBOX_ACCESS_TOKEN; // Placeholder for GitHub Secret
 }
