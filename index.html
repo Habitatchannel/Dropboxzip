@@ -58,11 +58,13 @@ const REDIRECT_URI = 'https://habitatchannel.github.io/Dropboxzip/'; // Your Git
 
 let dbx;
 
+// Function to start Dropbox OAuth 2.0 flow
 function authenticateDropbox() {
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${APP_KEY}&response_type=token&redirect_uri=${REDIRECT_URI}`;
     window.location.href = authUrl;
 }
 
+// Function to handle OAuth response and store token
 async function handleAuthResponse() {
     const hash = window.location.hash;
     if (hash) {
@@ -76,7 +78,13 @@ async function handleAuthResponse() {
     }
 }
 
+// Function to create folders in Dropbox
 async function createFolders() {
+    if (!dbx) {
+        console.error('Dropbox SDK not initialized.');
+        return;
+    }
+
     const mainFolder = document.getElementById('mainFolder').value.trim();
     const subfolder1 = document.getElementById('subfolder1').value.trim();
     const siteName = document.getElementById('siteName').value.trim();
@@ -91,7 +99,7 @@ async function createFolders() {
     try {
         document.getElementById('loading').style.display = 'inline'; // Show loading indicator
         const response = await dbx.filesCreateFolderV2({ path: folderPath });
-        console.log(response);
+        console.log('Response:', response);
         alert('Folders created successfully in Dropbox!');
         document.getElementById('siteName').value = ''; // Clear input
     } catch (error) {
@@ -102,9 +110,11 @@ async function createFolders() {
     }
 }
 
+// Event listeners for buttons
 document.getElementById('authButton').addEventListener('click', authenticateDropbox);
 document.getElementById('createButton').addEventListener('click', createFolders);
 
+// Check for OAuth token on page load
 handleAuthResponse();
 </script>
 
