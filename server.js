@@ -1,15 +1,38 @@
+require('dotenv').config();
 const express = require('express');
+const axios = require('axios');
 const app = express();
-require('dotenv').config(); // Load environment variables from .env file
+const port = 3000;
 
-// Endpoint to fetch Dropbox access token securely
-app.get('/getDropboxToken', (req, res) => {
-    const dropboxAccessToken = process.env.DROPBOX_ACCESS_TOKEN; // Fetch from environment variables
-    res.json({ dropboxAccessToken });
+app.use(express.json());
+app.use(express.static('public'));
+
+app.post('/create-folder', async (req, res) => {
+    const { mainFolder, subfolder1, siteName } = req.body;
+
+    if (!siteName) {
+        return res.status(400).json({ error: 'Please enter a Site Name.' });
+    }
+
+    let folderPath = `/${mainFolder}/${subfolder1}/${siteName}`;
+
+    try {
+        const response = await axios.post('https://api.dropboxapi.com/2/files/create_folder_v2', {
+            path: folderPath,
+            autorename: false
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.DROPBOX_ACCESS_TOKEN}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response ? error.response.status : 500).json({ error: error.message });
+    }
 });
 
-// Start server
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
