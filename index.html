@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Folders in Dropbox</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
-    <style>
-        .folder-input {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .folder-input label {
-            margin-right: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Folders in Dropbox</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/9.0.1/Dropbox-sdk.min.js"></script>
+<style>
+    .folder-input {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .folder-input label {
+        margin-right: 10px;
+    }
+    .loading {
+        display: none;
+    }
+</style>
 </head>
 <body>
 
@@ -43,35 +47,65 @@
 </div>
 
 <div>
-    <button onclick="createFolders()">Create Folders</button>
+    <button id="authButton">Authorize Dropbox</button>
+    <button id="createButton" disabled>Create Folders</button>
+    <span id="loading" class="loading">Creating folders...</span>
 </div>
 
 <script>
-// Function to handle folder creation
+const APP_KEY = 'YOUR_DROPBOX_APP_KEY'; // Replace with your Dropbox App Key
+const REDIRECT_URI = 'https://your-username.github.io/your-repository/'; // Your GitHub Pages URL
+
+let dbx;
+
+function authenticateDropbox() {
+    const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${APP_KEY}&response_type=token&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = authUrl;
+}
+
+async function handleAuthResponse() {
+    const hash = window.location.hash;
+    if (hash) {
+        const accessToken = new URLSearchParams(hash.substring(1)).get('access_token');
+        if (accessToken) {
+            localStorage.setItem('dropbox_access_token', accessToken);
+            dbx = new Dropbox.Dropbox({ accessToken });
+            document.getElementById('createButton').disabled = false;
+            alert('Dropbox authorized!');
+        }
+    }
+}
+
 async function createFolders() {
     const mainFolder = document.getElementById('mainFolder').value.trim();
     const subfolder1 = document.getElementById('subfolder1').value.trim();
     const siteName = document.getElementById('siteName').value.trim();
-
+    
     if (!siteName) {
         alert('Please enter a Site Name.');
         return;
     }
 
-    try {
-        const response = await axios.post('/create-folder', {
-            mainFolder,
-            subfolder1,
-            siteName
-        });
+    let folderPath = `/${mainFolder}/${subfolder1}/${siteName}`;
 
-        console.log(response.data);
+    try {
+        document.getElementById('loading').style.display = 'inline'; // Show loading indicator
+        const response = await dbx.filesCreateFolderV2({ path: folderPath });
+        console.log(response);
         alert('Folders created successfully in Dropbox!');
+        document.getElementById('siteName').value = ''; // Clear input
     } catch (error) {
-        console.error('Error creating folders:', error.response ? error.response.data : error.message);
+        console.error('Error creating folders:', error);
         alert('Failed to create folders in Dropbox. Check console for details.');
+    } finally {
+        document.getElementById('loading').style.display = 'none'; // Hide loading indicator
     }
 }
+
+document.getElementById('authButton').addEventListener('click', authenticateDropbox);
+document.getElementById('createButton').addEventListener('click', createFolders);
+
+handleAuthResponse();
 </script>
 
 </body>
