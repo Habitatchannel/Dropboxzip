@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Folders in Dropbox</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
-<style>
-    .folder-input {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-    .folder-input label {
-        margin-right: 10px;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Folders in Dropbox</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+    <style>
+        .folder-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .folder-input label {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -46,8 +46,33 @@
     <button onclick="createFolders()">Create Folders</button>
 </div>
 
-<!-- Link to external JavaScript file -->
-<script src="script.js"></script>
+<script>
+// Function to handle folder creation
+async function createFolders() {
+    const mainFolder = document.getElementById('mainFolder').value.trim();
+    const subfolder1 = document.getElementById('subfolder1').value.trim();
+    const siteName = document.getElementById('siteName').value.trim();
+
+    if (!siteName) {
+        alert('Please enter a Site Name.');
+        return;
+    }
+
+    try {
+        const response = await axios.post('/create-folder', {
+            mainFolder,
+            subfolder1,
+            siteName
+        });
+
+        console.log(response.data);
+        alert('Folders created successfully in Dropbox!');
+    } catch (error) {
+        console.error('Error creating folders:', error.response ? error.response.data : error.message);
+        alert('Failed to create folders in Dropbox. Check console for details.');
+    }
+}
+</script>
 
 </body>
 </html>
