@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Folders in Dropbox</title>
+<title>Create Folders and Upload Files to Dropbox</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
 <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
 <style>
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<h2>Create Folders in Dropbox</h2>
+<h2>Create Folders and Upload Files to Dropbox</h2>
 
 <div class="folder-input">
     <label for="mainFolder">Main Folder:</label>
@@ -46,10 +46,20 @@
     <input type="text" id="siteName" placeholder="Enter Site Name">
 </div>
 
+<div class="folder-input">
+    <label for="file1">Select Liscence agreement</label>
+    <input type="file" id="file1">
+</div>
+
+<div class="folder-input">
+    <label for="file2">Select SOW:</label>
+    <input type="file" id="file2">
+</div>
+
 <div>
     <button id="authButton">Authorize Dropbox</button>
-    <button id="createButton" disabled>Create Folders</button>
-    <span id="loading" class="loading">Creating folders...</span>
+    <button id="createButton" disabled>Create Folders and Upload Files</button>
+    <span id="loading" class="loading">Creating folders and uploading files...</span>
 </div>
 
 <script>
@@ -78,8 +88,25 @@ async function handleAuthResponse() {
     }
 }
 
-// Function to create folders in Dropbox
-async function createFolders() {
+// Function to upload a file to Dropbox
+async function uploadFile(file, path) {
+    try {
+        const fileContent = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsArrayBuffer(file);
+        });
+        const response = await dbx.filesUpload({ path, contents: fileContent });
+        console.log('File upload response:', response);
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Failed to upload files to Dropbox. Check console for details.');
+    }
+}
+
+// Function to create folders and upload files
+async function createFoldersAndUploadFiles() {
     if (!dbx) {
         console.error('Dropbox SDK not initialized.');
         return;
@@ -94,17 +121,34 @@ async function createFolders() {
         return;
     }
 
-    let folderPath = `/${mainFolder}/${subfolder1}/${siteName}`;
+    const folderPath = `/${mainFolder}/${subfolder1}/${siteName}`;
+    const file1 = document.getElementById('file1').files[0];
+    const file2 = document.getElementById('file2').files[0];
 
     try {
         document.getElementById('loading').style.display = 'inline'; // Show loading indicator
-        const response = await dbx.filesCreateFolderV2({ path: folderPath });
-        console.log('Response:', response);
-        alert('Folders created successfully in Dropbox!');
+        
+        // Create the folder
+        await dbx.filesCreateFolderV2({ path: folderPath });
+        console.log('Folders created successfully.');
+
+        // Upload files
+        if (file1) {
+            const file1Path = `${folderPath}/${file1.name}`;
+            await uploadFile(file1, file1Path);
+        }
+        if (file2) {
+            const file2Path = `${folderPath}/${file2.name}`;
+            await uploadFile(file2, file2Path);
+        }
+        
+        alert('Folders created and files uploaded successfully!');
         document.getElementById('siteName').value = ''; // Clear input
+        document.getElementById('file1').value = ''; // Clear file input
+        document.getElementById('file2').value = ''; // Clear file input
     } catch (error) {
-        console.error('Error creating folders:', error);
-        alert('Failed to create folders in Dropbox. Check console for details.');
+        console.error('Error:', error);
+        alert('Failed to create folders and upload files to Dropbox. Check console for details.');
     } finally {
         document.getElementById('loading').style.display = 'none'; // Hide loading indicator
     }
@@ -112,7 +156,7 @@ async function createFolders() {
 
 // Event listeners for buttons
 document.getElementById('authButton').addEventListener('click', authenticateDropbox);
-document.getElementById('createButton').addEventListener('click', createFolders);
+document.getElementById('createButton').addEventListener('click', createFoldersAndUploadFiles);
 
 // Check for OAuth token on page load
 handleAuthResponse();
